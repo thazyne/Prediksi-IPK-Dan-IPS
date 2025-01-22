@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Prediksi IPK & IPS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .grade-select option:checked {
+            background: #6366f1;
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Kalkulator Prediksi IPK & IPS</h1>
+
+            <div class="space-y-4">
+                <!-- Input Data Utama -->
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">IPK Saat Ini</label>
+                        <input type="number" step="0.01" id="currentGpa"
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Total SKS Kumulatif</label>
+                        <input type="number" id="totalCredits"
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">IPS Semester Ini</label>
+                        <input type="number" step="0.01" id="currentIps"
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">SKS Semester Ini</label>
+                        <input type="number" id="semesterCredits"
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Daftar Matkul Tambahan -->
+                <div class="pt-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Mata Kuliah Tambahan</h3>
+                    <div id="additionalCourses" class="space-y-3">
+                        <!-- Course inputs will be added here -->
+                    </div>
+
+                    <div class="mt-4 flex gap-3">
+                        <button onclick="addCourse()"
+                            class="flex items-center gap-1 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Tambah Matkul
+                        </button>
+                        <button onclick="calculate()"
+                            class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-300">
+                            Hitung Prediksi
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hasil Perhitungan -->
+                <div id="result" class="hidden mt-6 bg-gray-50 p-4 rounded-lg space-y-2">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Hasil Prediksi</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-white p-3 rounded-lg shadow-sm">
+                            <p class="text-sm text-gray-500">IPS Baru</p>
+                            <p class="text-xl font-bold text-indigo-600" id="newIps">-</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg shadow-sm">
+                            <p class="text-sm text-gray-500">IPK Baru</p>
+                            <p class="text-xl font-bold text-indigo-600" id="newGpa">-</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg shadow-sm">
+                            <p class="text-sm text-gray-500">Total SKS Semester</p>
+                            <p class="text-xl font-bold text-indigo-600" id="newSemesterCredits">-</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg shadow-sm">
+                            <p class="text-sm text-gray-500">Total SKS Kumulatif</p>
+                            <p class="text-xl font-bold text-indigo-600" id="newTotalCredits">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const grades = {
+            'A': 4.0,
+            'A-': 3.7,
+            'B+': 3.3,
+            'B': 3.0,
+            'B-': 2.7,
+            'C+': 2.3,
+            'C': 2.0,
+            'D': 1.0,
+            'E': 0.0
+        };
+
+        function addCourse() {
+            const courseDiv = document.createElement('div');
+            courseDiv.className = 'flex gap-3 items-center';
+            courseDiv.innerHTML = `
+                <input type="number" placeholder="SKS" class="addSks w-20 px-3 py-2 border rounded-lg" value="3" min="1">
+                <select class="addGrade w-32 px-3 py-2 border rounded-lg grade-select focus:ring-2 focus:ring-indigo-500">
+                    ${Object.entries(grades).map(([grade]) => `
+                        <option value="${grade}">${grade}</option>
+                    `).join('')}
+                </select>
+                <button onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            `;
+            document.getElementById('additionalCourses').appendChild(courseDiv);
+        }
+
+        function calculate() {
+            // Get current values
+            const currentGpa = parseFloat(document.getElementById('currentGpa').value);
+            const totalCredits = parseInt(document.getElementById('totalCredits').value);
+            const currentIps = parseFloat(document.getElementById('currentIps').value);
+            const semesterCredits = parseInt(document.getElementById('semesterCredits').value);
+
+            // Calculate additional courses
+            const additionalCourses = document.querySelectorAll('#additionalCourses .flex');
+            let additionalCredits = 0;
+            let additionalMutu = 0;
+
+            additionalCourses.forEach(course => {
+                const sks = parseInt(course.querySelector('.addSks').value) || 0;
+                const grade = course.querySelector('.addGrade').value;
+                additionalCredits += sks;
+                additionalMutu += sks * grades[grade];
+            });
+
+            // Calculate new IPS
+            const currentMutuSemester = currentIps * semesterCredits;
+            const newMutuSemester = currentMutuSemester + additionalMutu;
+            const newSemesterCredits = semesterCredits + additionalCredits;
+            const newIps = newMutuSemester / newSemesterCredits;
+
+            // Calculate new IPK
+            const currentTotalMutu = currentGpa * totalCredits;
+            const newTotalMutu = currentTotalMutu + additionalMutu;
+            const newTotalCredits = totalCredits + additionalCredits;
+            const newGpa = newTotalMutu / newTotalCredits;
+
+            // Display results
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('newIps').textContent = newIps.toFixed(2);
+            document.getElementById('newGpa').textContent = newGpa.toFixed(2);
+            document.getElementById('newSemesterCredits').textContent = newSemesterCredits;
+            document.getElementById('newTotalCredits').textContent = newTotalCredits;
+        }
+
+        // Add initial courses
+        addCourse();
+        addCourse();
+    </script>
+</body>
+
+</html>

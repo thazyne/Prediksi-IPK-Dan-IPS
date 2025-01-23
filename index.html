@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .grade-select option:checked { background: #6366f1; color: white; }
-        input[type="number"]::-webkit-inner-spin-button { opacity: 1; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -42,10 +41,7 @@
 
                 <!-- Daftar Matkul Tambahan -->
                 <div class="pt-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-lg font-semibold text-gray-800">Mata Kuliah Tambahan</h3>
-                        <span class="text-sm text-gray-500" id="totalAdditionalCreditsLabel">Total SKS: 0</span>
-                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Mata Kuliah Tambahan</h3>
                     <div id="additionalCourses" class="space-y-3">
                         <!-- Course inputs will be added here -->
                     </div>
@@ -69,10 +65,6 @@
                 <div id="result" class="hidden mt-6 bg-gray-50 p-4 rounded-lg space-y-2">
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">Hasil Prediksi</h3>
                     <div class="grid md:grid-cols-2 gap-4">
-                        <div class="bg-white p-3 rounded-lg shadow-sm">
-                            <p class="text-sm text-gray-500">SKS Tambahan</p>
-                            <p class="text-xl font-bold text-indigo-600" id="totalAdditionalCredits">0</p>
-                        </div>
                         <div class="bg-white p-3 rounded-lg shadow-sm">
                             <p class="text-sm text-gray-500">IPS Baru</p>
                             <p class="text-xl font-bold text-indigo-600" id="newIps">-</p>
@@ -108,53 +100,31 @@
             'E': 0.0
         };
 
-        function updateTotalCredits(additionalCredits) {
-            document.getElementById('totalAdditionalCreditsLabel').textContent = 
-                `Total SKS: ${additionalCredits}`;
-        }
-
         function addCourse() {
             const courseDiv = document.createElement('div');
             courseDiv.className = 'flex gap-3 items-center';
             courseDiv.innerHTML = `
-                <input type="number" placeholder="SKS" 
-                    class="addSks w-20 px-3 py-2 border rounded-lg" 
-                    value="3" min="1" oninput="calculateTotalCredits()">
-                <select class="addGrade w-32 px-3 py-2 border rounded-lg grade-select focus:ring-2 focus:ring-indigo-500"
-                    onchange="calculateTotalCredits()">
+                <input type="number" placeholder="SKS" class="addSks w-20 px-3 py-2 border rounded-lg" value="3" min="1">
+                <select class="addGrade w-32 px-3 py-2 border rounded-lg grade-select focus:ring-2 focus:ring-indigo-500">
                     ${Object.entries(grades).map(([grade]) => `
                         <option value="${grade}">${grade}</option>
                     `).join('')}
                 </select>
-                <button onclick="this.parentElement.remove(); calculateTotalCredits()" 
-                    class="text-red-500 hover:text-red-700">
+                <button onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                 </button>
             `;
             document.getElementById('additionalCourses').appendChild(courseDiv);
-            calculateTotalCredits();
-        }
-
-        function calculateTotalCredits() {
-            const additionalCourses = document.querySelectorAll('#additionalCourses .flex');
-            let additionalCredits = 0;
-            
-            additionalCourses.forEach(course => {
-                const sks = parseInt(course.querySelector('.addSks').value) || 0;
-                additionalCredits += sks;
-            });
-
-            updateTotalCredits(additionalCredits);
         }
 
         function calculate() {
             // Get current values
-            const currentGpa = parseFloat(document.getElementById('currentGpa').value) || 0;
-            const totalCredits = parseInt(document.getElementById('totalCredits').value) || 0;
-            const currentIps = parseFloat(document.getElementById('currentIps').value) || 0;
-            const semesterCredits = parseInt(document.getElementById('semesterCredits').value) || 0;
+            const currentGpa = parseFloat(document.getElementById('currentGpa').value);
+            const totalCredits = parseInt(document.getElementById('totalCredits').value);
+            const currentIps = parseFloat(document.getElementById('currentIps').value);
+            const semesterCredits = parseInt(document.getElementById('semesterCredits').value);
             
             // Calculate additional courses
             const additionalCourses = document.querySelectorAll('#additionalCourses .flex');
@@ -182,17 +152,15 @@
 
             // Display results
             document.getElementById('result').classList.remove('hidden');
-            document.getElementById('totalAdditionalCredits').textContent = additionalCredits;
             document.getElementById('newIps').textContent = newIps.toFixed(2);
             document.getElementById('newGpa').textContent = newGpa.toFixed(2);
             document.getElementById('newSemesterCredits').textContent = newSemesterCredits;
             document.getElementById('newTotalCredits').textContent = newTotalCredits;
         }
 
-        // Initial setup
+        // Add initial courses
         addCourse();
         addCourse();
-        calculateTotalCredits();
     </script>
 </body>
 </html>

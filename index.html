@@ -73,6 +73,10 @@
                 <div id="result" class="hidden mt-6 bg-gray-50 p-4 rounded-lg space-y-2">
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">Hasil Prediksi</h3>
                     <div class="grid md:grid-cols-2 gap-4">
+ <div class="bg-white p-3 rounded-lg shadow-sm">
+            <p class="text-sm text-gray-500">Total SKS Tambahan</p>
+            <p class="text-xl font-bold text-indigo-600" id="totalAdditionalCredits">-</p>
+        </div>
                         <div class="bg-white p-3 rounded-lg shadow-sm">
                             <p class="text-sm text-gray-500">IPS Baru</p>
                             <p class="text-xl font-bold text-indigo-600" id="newIps">-</p>
@@ -169,6 +173,10 @@
         // Add initial courses
         addCourse();
         addCourse();
+
+// Tampilkan total SKS tambahan
+    document.getElementById('totalAdditionalCredits').textContent = additionalCredits
+
     </script>
 </body>
 
